@@ -1,0 +1,25 @@
+[package]
+name = "jpzip"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+license = "MIT"
+description = "jpzip Japanese postal code SDK"
+repository = "https://github.com/jpzip/rust"
+readme = "README.md"
+keywords = ["jpzip", "zipcode", "postal-code", "japan", "sdk"]
+categories = ["api-bindings"]
+
+[dependencies]
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+tokio = { version = "1", features = ["sync", "time", "macros", "rt"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+async-trait = "0.1"
+thiserror = "1"
+lru = "0.12"
+futures = "0.3"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full", "test-util"] }
+wiremock = "0.6"
