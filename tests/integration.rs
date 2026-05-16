@@ -18,7 +18,7 @@ fn entry_json(pref: &str, city: &str) -> serde_json::Value {
         "city_roma": "Yokohama Shi Naka Ku",
         "city_code": "14104",
         "towns": [
-            {"town": "矢口台", "kana": "ヤグチダイ", "roma": "Yaguchidai"}
+            {"town": "本町", "kana": "ホンチョウ", "roma": "Honcho"}
         ]
     })
 }
@@ -46,13 +46,13 @@ async fn lookup_returns_entry() {
     Mock::given(method("GET"))
         .and(path("/p/231.json"))
         .respond_with(ResponseTemplate::new(200).set_body_json(json!({
-            "2310831": entry_json("神奈川県", "横浜市中区")
+            "2310017": entry_json("神奈川県", "横浜市中区")
         })))
         .mount(&server)
         .await;
 
     let client = make_client(&server).await;
-    let entry = client.lookup("2310831").await.unwrap().unwrap();
+    let entry = client.lookup("2310017").await.unwrap().unwrap();
     assert_eq!(entry.prefecture, "神奈川県");
     assert_eq!(entry.city, "横浜市中区");
 }
@@ -85,14 +85,14 @@ async fn lookup_group_3digit() {
     Mock::given(method("GET"))
         .and(path("/p/231.json"))
         .respond_with(ResponseTemplate::new(200).set_body_json(json!({
-            "2310831": entry_json("神奈川県", "横浜市中区")
+            "2310017": entry_json("神奈川県", "横浜市中区")
         })))
         .mount(&server)
         .await;
     let client = make_client(&server).await;
     let dict = client.lookup_group("231").await.unwrap();
     assert_eq!(dict.len(), 1);
-    assert!(dict.contains_key("2310831"));
+    assert!(dict.contains_key("2310017"));
 }
 
 #[tokio::test]
@@ -143,13 +143,13 @@ async fn refresh_clears_cache() {
     let m1 = Mock::given(method("GET"))
         .and(path("/p/231.json"))
         .respond_with(ResponseTemplate::new(200).set_body_json(json!({
-            "2310831": entry_json("First", "C1")
+            "2310017": entry_json("First", "C1")
         })))
         .expect(1..)
         .mount_as_scoped(&server)
         .await;
     let client = make_client(&server).await;
-    let e1 = client.lookup("2310831").await.unwrap().unwrap();
+    let e1 = client.lookup("2310017").await.unwrap().unwrap();
     assert_eq!(e1.prefecture, "First");
     drop(m1);
 
@@ -158,11 +158,11 @@ async fn refresh_clears_cache() {
     Mock::given(method("GET"))
         .and(path("/p/231.json"))
         .respond_with(ResponseTemplate::new(200).set_body_json(json!({
-            "2310831": entry_json("Second", "C2")
+            "2310017": entry_json("Second", "C2")
         })))
         .mount(&server)
         .await;
-    let e2 = client.lookup("2310831").await.unwrap().unwrap();
+    let e2 = client.lookup("2310017").await.unwrap().unwrap();
     assert_eq!(e2.prefecture, "Second");
 }
 
@@ -173,7 +173,7 @@ async fn meta_version_change_invalidates_cache() {
     Mock::given(method("GET"))
         .and(path("/p/231.json"))
         .respond_with(ResponseTemplate::new(200).set_body_json(json!({
-            "2310831": entry_json("X", "Y")
+            "2310017": entry_json("X", "Y")
         })))
         .mount(&server)
         .await;
@@ -188,7 +188,7 @@ async fn meta_version_change_invalidates_cache() {
 
     let client = make_client(&server).await;
     let _ = client.get_meta().await.unwrap();
-    let _ = client.lookup("2310831").await.unwrap();
+    let _ = client.lookup("2310017").await.unwrap();
 
     // Force a fresh meta call (refresh forgets the cached meta + clears L1).
     // But we want to test version-change invalidation specifically: simulate
@@ -253,7 +253,7 @@ async fn l2_cache_round_trip() {
     Mock::given(method("GET"))
         .and(path("/p/231.json"))
         .respond_with(ResponseTemplate::new(200).set_body_json(json!({
-            "2310831": entry_json("神奈川県", "横浜市中区")
+            "2310017": entry_json("神奈川県", "横浜市中区")
         })))
         .expect(1)
         .mount(&server)
@@ -271,7 +271,7 @@ async fn l2_cache_round_trip() {
         .build();
 
     // First call: hits network, writes L2.
-    let _ = client.lookup("2310831").await.unwrap().unwrap();
+    let _ = client.lookup("2310017").await.unwrap().unwrap();
     assert!(!store.lock().await.is_empty());
 
     // New client with the same L2: lookup must not re-fetch (expect=1 above).
@@ -279,7 +279,7 @@ async fn l2_cache_round_trip() {
         .base_url(server.uri())
         .cache(cache)
         .build();
-    let e = client2.lookup("2310831").await.unwrap().unwrap();
+    let e = client2.lookup("2310017").await.unwrap().unwrap();
     assert_eq!(e.prefecture, "神奈川県");
 }
 

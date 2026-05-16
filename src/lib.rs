@@ -10,7 +10,7 @@
 //!
 //! # async fn run() -> Result<(), jpzip::Error> {
 //! let client = JpzipClient::new();
-//! if let Some(entry) = client.lookup("2310831").await? {
+//! if let Some(entry) = client.lookup("2310017").await? {
 //!     println!("{} {}", entry.prefecture, entry.city);
 //! }
 //! # Ok(())

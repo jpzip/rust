@@ -18,7 +18,7 @@ cargo add jpzip
 use jpzip;
 
 # async fn run() -> Result<(), jpzip::Error> {
-let entry = jpzip::lookup("2310831").await?;
+let entry = jpzip::lookup("2310017").await?;
 // None なら見つからなかった
 
 let dict = jpzip::lookup_group("23").await?; // 2 桁は 10 並列 fetch
@@ -45,7 +45,7 @@ let client = JpzipClient::builder()
     .build();
 
 client.preload("all").await?;
-let entry = client.lookup("2310831").await?;
+let entry = client.lookup("2310017").await?;
 # Ok(())
 # }
 ```
