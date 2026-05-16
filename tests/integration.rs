@@ -236,6 +236,46 @@ async fn is_valid_zipcode_matches_seven_digits() {
 }
 
 #[tokio::test]
+async fn retry_on_5xx_then_success() {
+    let server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/p/231.json"))
+        .respond_with(ResponseTemplate::new(503))
+        .up_to_n_times(2)
+        .mount(&server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path("/p/231.json"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+            "2310017": entry_json("神奈川県", "横浜市中区")
+        })))
+        .mount(&server)
+        .await;
+    let client = make_client(&server).await;
+    let entry = client.lookup("2310017").await.unwrap().unwrap();
+    assert_eq!(entry.prefecture, "神奈川県");
+}
+
+#[tokio::test]
+async fn no_retry_on_4xx() {
+    // Regression: a non-404 4xx (e.g. 403) must error out immediately, not
+    // burn the 3-attempt retry budget. The expect(1) guards that.
+    let server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/p/231.json"))
+        .respond_with(ResponseTemplate::new(403))
+        .expect(1)
+        .mount(&server)
+        .await;
+    let client = make_client(&server).await;
+    let err = client.lookup("2310017").await.unwrap_err();
+    match err {
+        Error::Status { status, .. } => assert_eq!(status, 403),
+        other => panic!("expected Status(403), got {other:?}"),
+    }
+}
+
+#[tokio::test]
 async fn lookup_group_rejects_bad_prefix() {
     let server = MockServer::start().await;
     let client = make_client(&server).await;
