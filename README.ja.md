@@ -2,6 +2,7 @@
 
 [![crates.io](https://img.shields.io/crates/v/jpzip.svg)](https://crates.io/crates/jpzip)
 [![docs.rs](https://docs.rs/jpzip/badge.svg)](https://docs.rs/jpzip)
+[![Docs](https://img.shields.io/badge/docs-jpzip.nadai.dev-0066cc.svg)](https://jpzip.nadai.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Publish](https://github.com/jpzip/rust/actions/workflows/publish.yml/badge.svg)](https://github.com/jpzip/rust/actions/workflows/publish.yml)
 [![MSRV](https://img.shields.io/badge/MSRV-1.75-blue.svg)](#必要環境)
